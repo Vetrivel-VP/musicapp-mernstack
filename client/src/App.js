@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  inMemoryPersistence,
+  signInWithPopup,
+} from "firebase/auth";
 import { app } from "./config/firebase.config";
-import Todo from "./components/Todo";
+import { validateUser } from "./api";
 
 function App() {
   const firebaseAuth = getAuth(app);
@@ -12,7 +17,7 @@ function App() {
   const [auth, setAuth] = useState(
     false || window.localStorage.getItem("auth") === "true"
   );
-  const [token, setToken] = useState("");
+  const [user, setUser] = useState(null);
 
   const loginWithGoogle = async () => {
     await signInWithPopup(firebaseAuth, provider).then((userCred) => {
@@ -27,20 +32,22 @@ function App() {
     firebaseAuth.onAuthStateChanged((userCred) => {
       if (userCred) {
         userCred.getIdToken().then((token) => {
-          setToken(token);
           window.localStorage.setItem("auth", "true");
+          validateUser(token).then((data) => {
+            console.log(data);
+            setUser(data);
+          });
         });
+      } else {
+        setAuth(false);
+        setUser(null);
       }
     });
   }, []);
 
   return (
     <div className="App">
-      {auth ? (
-        <Todo token={token} />
-      ) : (
-        <button onClick={loginWithGoogle}>Login</button>
-      )}
+      {auth ? <h1>To do</h1> : <button onClick={loginWithGoogle}>Login</button>}
     </div>
   );
 }
