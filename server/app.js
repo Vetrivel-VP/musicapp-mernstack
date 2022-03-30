@@ -10,6 +10,7 @@ app.use(cors({ origin: true }));
 const userRoute = require("./routes/auth");
 app.use("/api/users/", userRoute);
 
+// If any depreciation warning add depreciation options
 mongoose.connect(process.env.DB_STRING, () => {
   console.log("Mongodb Connected");
 });
