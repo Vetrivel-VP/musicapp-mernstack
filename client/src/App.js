@@ -34,10 +34,10 @@ function App() {
         userCred.getIdToken().then((token) => {
           window.localStorage.setItem("auth", "true");
           console.log(token);
-          // validateUser(token).then((data) => {
-          //   console.log(data);
-          //   setUser(data);
-          // });
+          validateUser(token).then((data) => {
+            console.log(data);
+            setUser(data);
+          });
         });
       } else {
         setAuth(false);
