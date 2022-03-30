@@ -33,10 +33,11 @@ function App() {
       if (userCred) {
         userCred.getIdToken().then((token) => {
           window.localStorage.setItem("auth", "true");
-          validateUser(token).then((data) => {
-            console.log(data);
-            setUser(data);
-          });
+          console.log(token);
+          // validateUser(token).then((data) => {
+          //   console.log(data);
+          //   setUser(data);
+          // });
         });
       } else {
         setAuth(false);
