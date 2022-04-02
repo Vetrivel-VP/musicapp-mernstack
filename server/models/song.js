@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const artistSchema = mongoose.Schema(
+const SongSchema = mongoose.Schema(
   {
     name: {
       type: String,
@@ -11,11 +11,15 @@ const artistSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    twitter: {
+    album: {
       type: String,
       required: true,
     },
-    instagram: {
+    artist: {
+      type: String,
+      required: true,
+    },
+    duration: {
       type: String,
       required: true,
     },
@@ -23,4 +27,4 @@ const artistSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("artist", artistSchema);
+module.exports = mongoose.model("song", SongSchema);
