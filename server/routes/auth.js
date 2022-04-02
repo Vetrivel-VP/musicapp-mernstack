@@ -38,7 +38,7 @@ const newUserData = async (decodeValue, req, res) => {
     const savedUser = await newUser.save();
     res.status(200).send({ user: savedUser });
   } catch (err) {
-    res.status(400).send({ status: Failed, msg: err });
+    res.status(400).send({ success: false, msg: err });
   }
 };
 
@@ -57,7 +57,7 @@ const updateUserData = async (decodeValue, req, res) => {
     );
     res.status(200).send({ user: result });
   } catch (err) {
-    res.status(400).send({ status: Failed, msg: err });
+    res.status(400).send({ success: false, msg: err });
   }
 };
 

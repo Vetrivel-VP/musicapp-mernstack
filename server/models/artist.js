@@ -1,30 +1,25 @@
 const mongoose = require("mongoose");
 
-const UserSchema = mongoose.Schema(
+const artistSchema = mongoose.Schema(
   {
-    name: {
+    firstName: {
       type: String,
       required: true,
     },
-    email: {
+    lastName: {
       type: String,
       required: true,
     },
+
     imageURL: {
       type: String,
       required: true,
     },
-    user_id: {
+    twitter: {
       type: String,
       required: true,
     },
-
-    email_verfied: {
-      type: Boolean,
-      required: true,
-    },
-
-    auth_time: {
+    instagram: {
       type: String,
       required: true,
     },
@@ -32,4 +27,4 @@ const UserSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("user", UserSchema);
+module.exports = mongoose.model("artist", artistSchema);
