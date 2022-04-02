@@ -43,7 +43,7 @@ router.post("/save", async (req, res) => {
   }
 });
 
-router.post("/update/:updateId", async (req, res) => {
+router.put("/update/:updateId", async (req, res) => {
   const filter = { _id: req.params.updateId };
   const options = {
     upsert: true,

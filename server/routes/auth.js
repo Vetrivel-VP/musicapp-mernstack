@@ -25,6 +25,8 @@ router.get("/login", async (req, res) => {
   }
 });
 
+router.put("/favourites/:songId", (req, res) => {});
+
 const newUserData = async (decodeValue, req, res) => {
   const newUser = new user({
     name: decodeValue.name,

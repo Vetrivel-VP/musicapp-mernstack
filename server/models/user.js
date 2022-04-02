@@ -24,6 +24,12 @@ const UserSchema = mongoose.Schema(
       required: true,
     },
 
+    favourites: [
+      {
+        songId: String,
+      },
+    ],
+
     auth_time: {
       type: String,
       required: true,
