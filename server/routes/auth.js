@@ -25,7 +25,37 @@ router.get("/login", async (req, res) => {
   }
 });
 
-router.put("/favourites/:songId", (req, res) => {});
+router.put("/favourites/:userId", async (req, res) => {
+  const filter = { _id: req.params.userId };
+  const songId = req.query;
+
+  try {
+    console.log(filter, songId);
+    const result = await user.updateOne(filter, {
+      $push: { favourites: songId },
+    });
+    res.status(200).send({ success: true, msg: "Song added to favourites" });
+  } catch (error) {
+    res.status(400).send({ success: false, msg: error });
+  }
+});
+
+router.put("/removeFavourites/:userId", async (req, res) => {
+  const filter = { _id: req.params.userId };
+  const songId = req.query;
+
+  try {
+    console.log(filter, songId);
+    const result = await user.updateOne(filter, {
+      $pull: { favourites: { songId: songId } },
+    });
+    res
+      .status(200)
+      .send({ success: true, msg: "Song removed from favourites" });
+  } catch (error) {
+    res.status(400).send({ success: false, msg: error });
+  }
+});
 
 const newUserData = async (decodeValue, req, res) => {
   const newUser = new user({
