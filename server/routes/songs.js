@@ -81,4 +81,9 @@ router.delete("/delete/:deleteId", async (req, res) => {
   }
 });
 
+router.get("/getFavouritesSongs", async (req, res) => {
+  const query = req.query.songId;
+  res.send(query);
+});
+
 module.exports = router;

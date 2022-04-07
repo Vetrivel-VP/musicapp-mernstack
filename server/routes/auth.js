@@ -1,4 +1,5 @@
 const admin = require("../config/firebase.config");
+const song = require("../models/song");
 const user = require("../models/user");
 
 const router = require("express").Router();
@@ -40,6 +41,19 @@ router.put("/favourites/:userId", async (req, res) => {
   }
 });
 
+router.get("/getUser/:userId", async (req, res) => {
+  const filter = { _id: req.params.userId };
+
+  const userExists = await user.findOne({ _id: filter });
+  if (!userExists)
+    return res.status(400).send({ success: false, msg: "Invalid User ID" });
+  if (userExists.favourites) {
+    res.status(200).send({ success: true, data: userExists });
+  } else {
+    res.status(200).send({ success: false, data: null });
+  }
+});
+
 router.put("/removeFavourites/:userId", async (req, res) => {
   const filter = { _id: req.params.userId };
   const songId = req.query;
@@ -47,7 +61,7 @@ router.put("/removeFavourites/:userId", async (req, res) => {
   try {
     console.log(filter, songId);
     const result = await user.updateOne(filter, {
-      $pull: { favourites: { songId: songId } },
+      $pull: { favourites: songId },
     });
     res
       .status(200)
