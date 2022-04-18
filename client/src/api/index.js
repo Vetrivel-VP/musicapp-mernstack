@@ -8,5 +8,6 @@ export const validateUser = async (token) => {
       Authorization: "Bearer " + token,
     },
   });
+  console.log(res.headers);
   return res.data;
 };

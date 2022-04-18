@@ -16,7 +16,8 @@
     "express": "^4.17.3",
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.19.0",
-    "mongoose": "^6.2.8",
+    "mongodb": "^4.5.0",
+    "mongoose": "^6.3.0",
     "nodemon": "^2.0.15"
   }
 }
