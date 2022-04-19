@@ -15,7 +15,6 @@ import { actionType } from "./Context/reducer";
 
 function App() {
   const firebaseAuth = getAuth(app);
-  const provider = new GoogleAuthProvider();
   const navigate = useNavigate();
   const [{ user }, dispatch] = useStateValue();
 
@@ -23,23 +22,12 @@ function App() {
     false || window.localStorage.getItem("auth") === "true"
   );
 
-  const loginWithGoogle = async () => {
-    await signInWithPopup(firebaseAuth, provider).then((userCred) => {
-      if (userCred) {
-        setAuth(true);
-        window.localStorage.setItem("auth", "true");
-      }
-    });
-  };
-
   useEffect(() => {
     firebaseAuth.onAuthStateChanged((userCred) => {
       if (userCred) {
         userCred.getIdToken().then((token) => {
           window.localStorage.setItem("auth", "true");
-          console.log(token);
           validateUser(token).then((data) => {
-            console.log(data);
             dispatch({
               type: actionType.SET_USER,
               user: data,
@@ -58,9 +46,9 @@ function App() {
   }, []);
 
   return (
-    <div className="h-auto flex items-center justify-center">
+    <div className="h-auto flex items-center justify-center min-w-620">
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login setAuth={setAuth} />} />
         <Route path="/*" element={<Home />} />
       </Routes>
     </div>
