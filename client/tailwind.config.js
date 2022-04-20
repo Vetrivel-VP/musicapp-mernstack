@@ -56,6 +56,7 @@ module.exports = {
         cartBg: "#282a2c",
         cartItem: "#2e3033",
         cartTotal: "#343739",
+        loaderOverlay: "rgba(256,256,256,0.1)",
       },
     },
   },

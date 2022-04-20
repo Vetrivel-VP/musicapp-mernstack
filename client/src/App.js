@@ -9,7 +9,7 @@ import {
 } from "firebase/auth";
 import { app } from "./config/firebase.config";
 import { validateUser } from "./api";
-import { Home, Login } from "./components";
+import { Home, Loader, Login } from "./components";
 import { useStateValue } from "./Context/StateProvider";
 import { actionType } from "./Context/reducer";
 
@@ -17,12 +17,14 @@ function App() {
   const firebaseAuth = getAuth(app);
   const navigate = useNavigate();
   const [{ user }, dispatch] = useStateValue();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [auth, setAuth] = useState(
     false || window.localStorage.getItem("auth") === "true"
   );
 
   useEffect(() => {
+    setIsLoading(true);
     firebaseAuth.onAuthStateChanged((userCred) => {
       if (userCred) {
         userCred.getIdToken().then((token) => {
@@ -34,12 +36,14 @@ function App() {
             });
           });
         });
+        setIsLoading(false);
       } else {
         setAuth(false);
         dispatch({
           type: actionType.SET_USER,
           user: null,
         });
+        setIsLoading(false);
         navigate("/login");
       }
     });
@@ -47,6 +51,11 @@ function App() {
 
   return (
     <div className="h-auto flex items-center justify-center min-w-620">
+      {isLoading && (
+        <div className="fixed inset-0 bg-loaderOverlay backdrop-blur-sm ">
+          <Loader />
+        </div>
+      )}
       <Routes>
         <Route path="/login" element={<Login setAuth={setAuth} />} />
         <Route path="/*" element={<Home />} />
