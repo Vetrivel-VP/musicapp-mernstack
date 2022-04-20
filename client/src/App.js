@@ -44,6 +44,7 @@ function App() {
           user: null,
         });
         setIsLoading(false);
+        window.localStorage.setItem("auth", "false");
         navigate("/login");
       }
     });
@@ -51,11 +52,12 @@ function App() {
 
   return (
     <div className="h-auto flex items-center justify-center min-w-620">
-      {isLoading && (
-        <div className="fixed inset-0 bg-loaderOverlay backdrop-blur-sm ">
-          <Loader />
-        </div>
-      )}
+      {isLoading ||
+        (!user && (
+          <div className="fixed inset-0 bg-loaderOverlay backdrop-blur-sm ">
+            <Loader />
+          </div>
+        ))}
       <Routes>
         <Route path="/login" element={<Login setAuth={setAuth} />} />
         <Route path="/*" element={<Home />} />
