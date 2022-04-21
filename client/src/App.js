@@ -12,6 +12,7 @@ import { validateUser } from "./api";
 import { Home, Loader, Login } from "./components";
 import { useStateValue } from "./Context/StateProvider";
 import { actionType } from "./Context/reducer";
+import { AnimatePresence } from "framer-motion";
 
 function App() {
   const firebaseAuth = getAuth(app);
@@ -51,18 +52,20 @@ function App() {
   }, []);
 
   return (
-    <div className="h-auto flex items-center justify-center min-w-620">
-      {isLoading ||
-        (!user && (
-          <div className="fixed inset-0 bg-loaderOverlay backdrop-blur-sm ">
-            <Loader />
-          </div>
-        ))}
-      <Routes>
-        <Route path="/login" element={<Login setAuth={setAuth} />} />
-        <Route path="/*" element={<Home />} />
-      </Routes>
-    </div>
+    <AnimatePresence>
+      <div className="h-auto flex items-center justify-center min-w-620">
+        {isLoading ||
+          (!user && (
+            <div className="fixed inset-0 bg-loaderOverlay backdrop-blur-sm ">
+              <Loader />
+            </div>
+          ))}
+        <Routes>
+          <Route path="/login" element={<Login setAuth={setAuth} />} />
+          <Route path="/*" element={<Home />} />
+        </Routes>
+      </div>
+    </AnimatePresence>
   );
 }
 

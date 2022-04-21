@@ -30,6 +30,11 @@ const UserSchema = mongoose.Schema(
       },
     ],
 
+    role: {
+      type: String,
+      required: true,
+    },
+
     auth_time: {
       type: String,
       required: true,
