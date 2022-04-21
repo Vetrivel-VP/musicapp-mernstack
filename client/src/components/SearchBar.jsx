@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { IoCloseCircle, IoSearch } from "react-icons/io5";
-import { motion } from "framer-motion";
+import React from "react";
+import { IoSearch } from "react-icons/io5";
 import { actionType } from "../Context/reducer";
 import { useStateValue } from "../Context/StateProvider";
 
