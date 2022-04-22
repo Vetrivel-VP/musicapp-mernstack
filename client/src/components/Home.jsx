@@ -1,5 +1,6 @@
 import React from "react";
 import { useStateValue } from "../Context/StateProvider";
+import Filter from "./Filter";
 import Header from "./Header";
 import SearchBar from "./SearchBar";
 
@@ -11,13 +12,15 @@ const Home = () => {
       <SearchBar />
 
       {searchTerm.length > 0 && (
-        <p className="my-8 text-base text-textColor">
-          Searched for :{" "}
+        <p className="my-4 text-base text-textColor">
+          Searched for :
           <span className="text-xl text-cartBg font-semibold">
             {searchTerm}
           </span>
         </p>
       )}
+
+      <Filter />
     </div>
   );
 };

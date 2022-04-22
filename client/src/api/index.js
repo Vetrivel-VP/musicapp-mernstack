@@ -14,3 +14,12 @@ export const validateUser = async (token) => {
     return null;
   }
 };
+
+export const getAllArtist = async () => {
+  try {
+    const res = await axios.get(`${baseURL}api/artists/getAll`);
+    return res.data;
+  } catch (error) {
+    return null;
+  }
+};
