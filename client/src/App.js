@@ -9,7 +9,7 @@ import {
 } from "firebase/auth";
 import { app } from "./config/firebase.config";
 import { validateUser } from "./api";
-import { Home, Loader, Login } from "./components";
+import { Dashboard, Home, Loader, Login, UserProfile } from "./components";
 import { useStateValue } from "./Context/StateProvider";
 import { actionType } from "./Context/reducer";
 import { AnimatePresence } from "framer-motion";
@@ -63,6 +63,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login setAuth={setAuth} />} />
           <Route path="/*" element={<Home />} />
+          <Route path="/dashboard/*" element={<Dashboard />} />
+          <Route path="/userProfile" element={<UserProfile />} />
         </Routes>
       </div>
     </AnimatePresence>
