@@ -5,4 +5,5 @@ export const initialState = {
   artists: null,
   artistFilter: null,
   languageFilter: null,
+  allUsers: null,
 };

@@ -13,3 +13,4 @@ export { default as DashboardAlbum } from "./DashboardAlbum";
 export { default as DashboardArtist } from "./DashboardArtist";
 export { default as DashboardSongs } from "./DashboardSongs";
 export { default as DashboardUser } from "./DashboardUser";
+export { default as DashboardUserCard } from "./DashboardUserCard";

@@ -41,6 +41,22 @@ router.put("/favourites/:userId", async (req, res) => {
   }
 });
 
+router.get("/getUsers", async (req, res) => {
+  const options = {
+    // sort returned documents in ascending order
+    sort: { createdAt: 1 },
+    // Include only the following
+    // projection : {}
+  };
+
+  const cursor = await user.find(options);
+  if (cursor) {
+    res.status(200).send({ success: true, data: cursor });
+  } else {
+    res.status(200).send({ success: true, msg: "No Data Found" });
+  }
+});
+
 router.get("/getUser/:userId", async (req, res) => {
   const filter = { _id: req.params.userId };
 
@@ -52,6 +68,28 @@ router.get("/getUser/:userId", async (req, res) => {
   } else {
     res.status(200).send({ success: false, data: null });
   }
+});
+
+router.put("/updateRole", async (req, res) => {
+  console.log(res.data.json);
+  // const filter = { _id: req.params.userId };
+  // const role = req.query.role;
+
+  // const options = {
+  //   upsert: true,
+  //   new: true,
+  // };
+
+  // try {
+  //   const result = await user.findOneAndUpdate(
+  //     filter,
+  //     { role: decodeValue.auth_time },
+  //     options
+  //   );
+  //   res.status(200).send({ user: result });
+  // } catch (err) {
+  //   res.status(400).send({ success: false, msg: err });
+  // }
 });
 
 router.put("/removeFavourites/:userId", async (req, res) => {

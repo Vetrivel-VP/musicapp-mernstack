@@ -23,3 +23,25 @@ export const getAllArtist = async () => {
     return null;
   }
 };
+
+export const getAllUsers = async () => {
+  try {
+    const res = await axios.get(`${baseURL}api/users/getUsers`);
+    return res.data;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const changingUserRole = async (userId, role) => {
+  console.log(userId, role);
+  try {
+    const res = await axios.put(`${baseURL}api/users/updateRole`, {
+      user_id: userId,
+      role: role,
+    });
+    return res.data;
+  } catch (error) {
+    return null;
+  }
+};

@@ -5,6 +5,7 @@ export const actionType = {
   SET_ARTISTS: "SET_ARTISTS",
   SET_ARTIST_FILTER: "SET_ARTIST_FILTER",
   SET_LANGUAGE_FILTER: "SET_LANGUAGE_FILTER",
+  SET_ALL_USERS: "SET_ALL_USERS",
 };
 
 const reducer = (state, action) => {
@@ -45,6 +46,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         languageFilter: action.languageFilter,
+      };
+
+    case actionType.SET_ALL_USERS:
+      return {
+        ...state,
+        allUsers: action.allUsers,
       };
 
     default:
