@@ -1,6 +1,7 @@
 import React from "react";
 import { IoHome } from "react-icons/io5";
 import { NavLink, Route, Routes } from "react-router-dom";
+import { DashboardNewSong } from ".";
 import { isActiveStyles, isNotActiveStyles } from "../utils/styles";
 import DashboardAlbum from "./DashboardAlbum";
 import DashboardArtist from "./DashboardArtist";
@@ -37,6 +38,7 @@ const Dashboard = () => {
           <Route path="/songs" element={<DashboardSongs />} />
           <Route path="/artist" element={<DashboardArtist />} />
           <Route path="/albums" element={<DashboardAlbum />} />
+          <Route path="/newSong" element={<DashboardNewSong />} />
         </Routes>
       </div>
     </div>

@@ -7,7 +7,6 @@ import { bgColors } from "../utils/styles";
 export const DashboardCard = ({ icon, name, count }) => {
   const bg_color = bgColors[parseInt(Math.random() * bgColors.length)];
 
-  console.log(bg_color);
   return (
     <div
       style={{ background: `${bg_color}` }}

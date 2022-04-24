@@ -34,12 +34,28 @@ export const getAllUsers = async () => {
 };
 
 export const changingUserRole = async (userId, role) => {
-  console.log(userId, role);
   try {
-    const res = await axios.put(`${baseURL}api/users/updateRole`, {
-      user_id: userId,
-      role: role,
+    const res = axios.put(`${baseURL}api/users/updateRole/${userId}`, {
+      data: { role: role },
     });
+    return res;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const removeUser = async (userId) => {
+  try {
+    const res = axios.delete(`${baseURL}api/users/delete/${userId}`);
+    return res;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const getAllSongs = async () => {
+  try {
+    const res = await axios.get(`${baseURL}api/songs/getAll`);
     return res.data;
   } catch (error) {
     return null;

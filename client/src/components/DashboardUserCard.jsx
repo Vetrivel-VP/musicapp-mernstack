@@ -1,18 +1,64 @@
 import React, { useState } from "react";
 import moment from "moment";
 import { motion } from "framer-motion";
-import { changingUserRole } from "../api";
+import { changingUserRole, getAllUsers, removeUser } from "../api";
+import { actionType } from "../Context/reducer";
+import { useStateValue } from "../Context/StateProvider";
+import { MdDelete } from "react-icons/md";
 
 const DashboardUserCard = ({ data }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdateRole, setIsUpdateRole] = useState(false);
+
+  const [{ allUsers, user }, dispatch] = useStateValue();
   const createdAt = moment(new Date(data.createdAt)).format("MMMM Do YYYY");
 
   const UpdateUserRole = (userId, role) => {
-    changingUserRole(userId, role);
+    setIsLoading(true);
+    setIsUpdateRole(false);
+    changingUserRole(userId, role).then((res) => {
+      if (res) {
+        getAllUsers().then((data) => {
+          dispatch({
+            type: actionType.SET_ALL_USERS,
+            allUsers: data.data,
+          });
+        });
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 2000);
+      }
+    });
   };
+
+  const deleteuser = (userId) => {
+    setIsLoading(true);
+    removeUser(userId).then((res) => {
+      if (res) {
+        getAllUsers().then((data) => {
+          dispatch({
+            type: actionType.SET_ALL_USERS,
+            allUsers: data.data,
+          });
+        });
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 2000);
+      }
+    });
+  };
+
   return (
     <div className="relative w-full rounded-md flex items-center justify-between py-4 bg-lightOverlay cursor-pointer hover:bg-card hover:shadow-md">
+      {data._id !== user?.user._id && (
+        <motion.div
+          whileTap={{ scale: 0.75 }}
+          className="absolute left-4 w-8 h-8 rounded-md flex items-center justify-center bg-gray-200"
+          onClick={() => deleteuser(data._id)}
+        >
+          <MdDelete className="text-xl text-red-400 hover:text-red-500" />
+        </motion.div>
+      )}
       <div className="w-275 min-w-[160px] flex items-center justify-center">
         {/* prettier-ignore */}
         <img src={data.imageURL} alt="" className="w-10 h-10 object-cover rounded-md min-w-[40px] shadow-md"
@@ -28,13 +74,15 @@ const DashboardUserCard = ({ data }) => {
       <p className="text-base text-textColor w-275 min-w-[160px] text-center">{createdAt}</p>
       <div className=" w-275 min-w-[160px] text-center flex items-center justify-center gap-6 relative">
         <p className="text-base text-textColor"> {data.role}</p>
-        <motion.p
-          whileTap={{ scale: 0.75 }}
-          className="text-[10px]  font-semibold text-textColor px-1 bg-purple-200 rounded-sm hover:shadow-md"
-          onClick={() => setIsUpdateRole(true)}
-        >
-          {data.role === "admin" ? "Member" : "Admin"}
-        </motion.p>
+        {data._id !== user?.user._id && (
+          <motion.p
+            whileTap={{ scale: 0.75 }}
+            className="text-[10px]  font-semibold text-textColor px-1 bg-purple-200 rounded-sm hover:shadow-md"
+            onClick={() => setIsUpdateRole(true)}
+          >
+            {data.role === "admin" ? "Member" : "Admin"}
+          </motion.p>
+        )}
         {isUpdateRole && (
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
@@ -52,7 +100,7 @@ const DashboardUserCard = ({ data }) => {
                 className="outline-none border-none text-sm px-4 py-1 rounded-md bg-blue-200 text-black hover:shadow-md"
                 onClick={() =>
                   UpdateUserRole(
-                    data.user_id,
+                    data._id,
                     data.role === "admin" ? "member" : "admin"
                   )
                 }

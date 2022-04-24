@@ -6,6 +6,7 @@ export const actionType = {
   SET_ARTIST_FILTER: "SET_ARTIST_FILTER",
   SET_LANGUAGE_FILTER: "SET_LANGUAGE_FILTER",
   SET_ALL_USERS: "SET_ALL_USERS",
+  SET_ALL_SONGS: "SET_ALL_SONGS",
 };
 
 const reducer = (state, action) => {
@@ -52,6 +53,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         allUsers: action.allUsers,
+      };
+
+    case actionType.SET_ALL_SONGS:
+      return {
+        ...state,
+        allSongs: action.allSongs,
       };
 
     default:
