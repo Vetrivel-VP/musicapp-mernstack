@@ -13,13 +13,16 @@ const SongSchema = mongoose.Schema(
     },
     album: {
       type: String,
-      required: true,
     },
     artist: {
       type: String,
       required: true,
     },
     language: {
+      type: String,
+      required: true,
+    },
+    category: {
       type: String,
       required: true,
     },

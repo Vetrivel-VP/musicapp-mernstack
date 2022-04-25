@@ -7,4 +7,6 @@ export const initialState = {
   languageFilter: null,
   allUsers: null,
   allSongs: null,
+  allAlbums: null,
+  albumFilter: null,
 };

@@ -61,3 +61,12 @@ export const getAllSongs = async () => {
     return null;
   }
 };
+
+export const getAllAlbums = async () => {
+  try {
+    const res = await axios.get(`${baseURL}api/albums/getAll`);
+    return res.data;
+  } catch (error) {
+    return null;
+  }
+};

@@ -37,6 +37,7 @@ router.post("/save", async (req, res) => {
     album: req.body.album,
     artist: req.body.artist,
     language: req.body.language,
+    category: req.body.category,
     duration: req.body.duration,
   });
   try {
@@ -62,6 +63,7 @@ router.put("/update/:updateId", async (req, res) => {
         album: req.body.album,
         artist: req.body.artist,
         language: req.body.language,
+        category: req.body.category,
         duration: req.body.duration,
       },
       options

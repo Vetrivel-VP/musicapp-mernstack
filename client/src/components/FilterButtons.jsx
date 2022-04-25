@@ -9,7 +9,7 @@ const FilterButtons = ({ filterData, flag }) => {
   const [filterName, setFilterName] = useState(null);
   const [filterMenu, setFilterMenu] = useState(false);
 
-  const [{ artistFilter }, dispatch] = useStateValue();
+  const [{ artistFilter, albumFilter, filterTerm }, dispatch] = useStateValue();
 
   const updateFilterButton = (name) => {
     setFilterName(name);
@@ -17,8 +17,17 @@ const FilterButtons = ({ filterData, flag }) => {
 
     if (flag === "Artist") {
       dispatch({ type: actionType.SET_ARTIST_FILTER, artistFilter: name });
-    } else {
+    }
+    if (flag === "Language") {
       dispatch({ type: actionType.SET_LANGUAGE_FILTER, languageFilter: name });
+    }
+
+    if (flag === "Albums") {
+      dispatch({ type: actionType.SET_ALBUM_FILTER, albumFilter: name });
+    }
+
+    if (flag === "Category") {
+      dispatch({ type: actionType.SET_FILTER_TERM, filterTerm: name });
     }
   };
 

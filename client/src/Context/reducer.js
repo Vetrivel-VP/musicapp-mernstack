@@ -7,6 +7,8 @@ export const actionType = {
   SET_LANGUAGE_FILTER: "SET_LANGUAGE_FILTER",
   SET_ALL_USERS: "SET_ALL_USERS",
   SET_ALL_SONGS: "SET_ALL_SONGS",
+  SET_ALL_ALBUMNS: "SET_ALL_ALBUMNS",
+  SET_ALBUM_FILTER: "SET_ALBUM_FILTER",
 };
 
 const reducer = (state, action) => {
@@ -59,6 +61,18 @@ const reducer = (state, action) => {
       return {
         ...state,
         allSongs: action.allSongs,
+      };
+
+    case actionType.SET_ALL_ALBUMNS:
+      return {
+        ...state,
+        allAlbums: action.allAlbums,
+      };
+
+    case actionType.SET_ALBUM_FILTER:
+      return {
+        ...state,
+        albumFilter: action.albumFilter,
       };
 
     default:
