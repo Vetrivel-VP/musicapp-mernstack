@@ -1,17 +1,23 @@
 import React, { useEffect } from "react";
 import { actionType } from "../Context/reducer";
 import { useStateValue } from "../Context/StateProvider";
-import { getAllArtist } from "../api";
+import { getAllAlbums, getAllArtist } from "../api";
 import { filterByLanguage, filters } from "../utils/supportfunctions";
 import FilterButtons from "./FilterButtons";
 
 const Filter = () => {
-  const [{ filterTerm, artists }, dispatch] = useStateValue();
+  const [{ filterTerm, artists, allAlbums }, dispatch] = useStateValue();
 
   useEffect(() => {
     if (!artists) {
       getAllArtist().then((data) => {
         dispatch({ type: actionType.SET_ARTISTS, artists: data.data });
+      });
+    }
+
+    if (!allAlbums) {
+      getAllAlbums().then((data) => {
+        dispatch({ type: actionType.SET_ALL_ALBUMNS, allAlbums: data.data });
       });
     }
   }, []);
@@ -23,7 +29,7 @@ const Filter = () => {
     });
   };
   return (
-    <div className="w-full my-4 px-6 py-4 flex items-center justify-start md:justify-evenly">
+    <div className="w-full my-4 px-6 py-4 flex items-center justify-start md:justify-center gap-10">
       <FilterButtons filterData={artists} flag={"Artist"} />
 
       <div className=" flex items-center gap-6 mx-4">
@@ -39,6 +45,8 @@ const Filter = () => {
           </p>
         ))}
       </div>
+
+      <FilterButtons filterData={allAlbums} flag={"Albums"} />
 
       <FilterButtons filterData={filterByLanguage} flag={"Language"} />
     </div>
