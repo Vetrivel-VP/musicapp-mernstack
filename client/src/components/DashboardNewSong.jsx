@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   getStorage,
   ref,
@@ -15,9 +15,17 @@ import { BsEmojiSmile, BsEmojiFrown } from "react-icons/bs";
 import { storage } from "../config/firebase.config";
 import { useStateValue } from "../Context/StateProvider";
 import FilterButtons from "./FilterButtons";
-import { getAllAlbums, getAllArtist } from "../api";
+import {
+  getAllAlbums,
+  getAllArtist,
+  getAllSongs,
+  saveNewAlbum,
+  saveNewArtist,
+  saveNewSong,
+} from "../api";
 import { actionType } from "../Context/reducer";
 import { filterByLanguage, filters } from "../utils/supportfunctions";
+import { IoMusicalNote } from "react-icons/io5";
 
 export const ImageLoader = ({ progress }) => {
   return (
@@ -36,7 +44,7 @@ export const AlertSuccess = ({ msg }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: -100, scale: 0.6 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
+      animate={{ opacity: 1, y: 50, scale: 1 }}
       exit={{ opacity: 0, y: -100, scale: 0.6 }}
       className="w-screen z-50 fixed top-0 left-0 flex items-center justify-center"
     >
@@ -44,7 +52,7 @@ export const AlertSuccess = ({ msg }) => {
         <div className="w-[4px] h-10 bg-green-500 rounded-md"></div>
         <BsEmojiSmile className="text-xl text-green-500" />
         <p className="text-base font-semibold text-textColor">
-          {msg.length > 50 ? `${msg.slice(0, 50)}...` : msg}
+          {msg?.length > 50 ? `${msg?.slice(0, 50)}...` : msg}
         </p>
       </div>
     </motion.div>
@@ -55,7 +63,7 @@ export const AlertError = ({ msg }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: -100, scale: 0.6 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
+      animate={{ opacity: 1, y: 50, scale: 1 }}
       exit={{ opacity: 0, y: -100, scale: 0.6 }}
       className="w-screen z-50 fixed top-0 left-0 flex items-center justify-center"
     >
@@ -63,7 +71,7 @@ export const AlertError = ({ msg }) => {
         <div className="w-[4px] h-10 bg-red-500 rounded-md"></div>
         <BsEmojiFrown className="text-xl text-red-500" />
         <p className="text-base font-semibold text-textColor">
-          {msg.length > 50 ? `${msg.slice(0, 50)}...` : msg}
+          {msg?.length > 50 ? `${msg?.slice(0, 50)}...` : msg}
         </p>
       </div>
     </motion.div>
@@ -94,7 +102,7 @@ export const ImageUploader = ({
       },
 
       (error) => {
-        setAlert(true);
+        setAlert("error");
         alertMsg("File upload failed.");
         setTimeout(() => {
           setAlert(null);
@@ -106,7 +114,7 @@ export const ImageUploader = ({
           setImageURL(downloadUrl);
           setProgress(0);
           isLoading(false);
-          setAlert(true);
+          setAlert("success");
           alertMsg("File uploaded successfully");
           setTimeout(() => {
             setAlert(null);
@@ -144,11 +152,11 @@ export const DisabledButton = () => {
     <button
       disabled
       type="button"
-      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center"
+      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center"
     >
       <svg
         role="status"
-        class="inline w-4 h-4 mr-3 text-white animate-spin"
+        className="inline w-4 h-4 mr-3 text-white animate-spin"
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -178,8 +186,20 @@ const DashboardNewSong = () => {
 
   const [songName, setSongName] = useState("");
   const [audioAsset, setAudioAsset] = useState(null);
+  const [duration, setDuration] = useState(null);
+  const audioRef = useRef();
 
-  const [{ artists, allAlbums }, dispatch] = useStateValue();
+  const [
+    {
+      artists,
+      allAlbums,
+      albumFilter,
+      artistFilter,
+      filterTerm,
+      languageFilter,
+    },
+    dispatch,
+  ] = useStateValue();
 
   useEffect(() => {
     if (!artists) {
@@ -195,6 +215,21 @@ const DashboardNewSong = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (audioAsset) {
+      console.log(duration);
+      setDuration(calculateTime(audioRef.current.duration));
+    }
+  }, [duration]);
+
+  const calculateTime = (sec) => {
+    const minutes = Math.floor(sec / 60);
+    const returnMin = minutes < 10 ? `0${minutes}` : `${minutes}`;
+    const seconds = Math.floor(sec % 60);
+    const returnSec = seconds < 10 ? `0${seconds}` : `${seconds}`;
+    return `${returnMin} : ${returnSec}`;
+  };
+
   const deleteImageObject = (songURL, action) => {
     if (action === "image") {
       setIsImageLoading(true);
@@ -205,7 +240,7 @@ const DashboardNewSong = () => {
     }
     const deleteRef = ref(storage, songURL);
     deleteObject(deleteRef).then(() => {
-      setSetAlert(true);
+      setSetAlert("success");
       setAlertMsg("File removed successfully");
       setTimeout(() => {
         setSetAlert(null);
@@ -213,6 +248,48 @@ const DashboardNewSong = () => {
       setIsImageLoading(false);
       setIsAudioLoading(false);
     });
+  };
+
+  const saveSong = () => {
+    if (!songImageUrl || !audioAsset || !songName) {
+      setSetAlert("error");
+      setAlertMsg("Required fields are missing");
+      setTimeout(() => {
+        setSetAlert(null);
+      }, 4000);
+    } else {
+      setIsImageLoading(true);
+      setIsAudioLoading(true);
+      const data = {
+        name: songName,
+        imageURL: songImageUrl,
+        album: albumFilter,
+        artist: artistFilter,
+        language: languageFilter,
+        category: filterTerm,
+        duration: duration,
+      };
+      saveNewSong(data).then((res) => {
+        getAllSongs().then((songs) => {
+          dispatch({ type: actionType.SET_ALL_SONGS, allSongs: songs.data });
+        });
+      });
+      setSetAlert("success");
+      setAlertMsg("Data saved successfully");
+      setTimeout(() => {
+        setSetAlert(null);
+      }, 4000);
+      setIsImageLoading(false);
+      setIsAudioLoading(false);
+      setSongName("");
+      setSongImageUrl(null);
+      setAudioAsset(null);
+      dispatch({ type: actionType.SET_ARTIST_FILTER, artistFilter: null });
+      dispatch({ type: actionType.SET_LANGUAGE_FILTER, languageFilter: null });
+      dispatch({ type: actionType.SET_ALBUM_FILTER, albumFilter: null });
+      dispatch({ type: actionType.SET_FILTER_TERM, filterTerm: null });
+      setDuration(null);
+    }
   };
 
   return (
@@ -235,83 +312,384 @@ const DashboardNewSong = () => {
           </div>
 
           <div className="flex items-center justify-between gap-2 w-full flex-wrap">
-            <div className="bg-card backdrop-blur-md w-full lg:w-300 h-300 rounded-md border-2 border-dotted border-gray-300 cursor-pointer">
+            <div className="bg-card  backdrop-blur-md w-full lg:w-300 h-300 rounded-md border-2 border-dotted border-gray-300 cursor-pointer">
               {isImageLoading && <ImageLoader progress={uploadProgress} />}
-              {!songImageUrl ? (
-                <ImageUploader
-                  setImageURL={setSongImageUrl}
-                  setAlert={setSetAlert}
-                  alertMsg={setAlertMsg}
-                  isLoading={setIsImageLoading}
-                  setProgress={setUploadProgress}
-                  isImage={true}
-                />
-              ) : (
-                <div className="relative w-full h-full overflow-hidden rounded-md">
-                  <img
-                    src={songImageUrl}
-                    alt="uploaded image"
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    className="absolute bottom-3 right-3 p-3 rounded-full bg-red-500 text-xl cursor-pointer outline-none hover:shadow-md  duration-500 transition-all ease-in-out"
-                    onClick={() => {
-                      deleteImageObject(songImageUrl, "image");
-                    }}
-                  >
-                    <MdDelete className="text-white" />
-                  </button>
-                </div>
+              {!isImageLoading && (
+                <>
+                  {!songImageUrl ? (
+                    <ImageUploader
+                      setImageURL={setSongImageUrl}
+                      setAlert={setSetAlert}
+                      alertMsg={setAlertMsg}
+                      isLoading={setIsImageLoading}
+                      setProgress={setUploadProgress}
+                      isImage={true}
+                    />
+                  ) : (
+                    <div className="relative w-full h-full overflow-hidden rounded-md">
+                      <img
+                        src={songImageUrl}
+                        alt="uploaded image"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        className="absolute bottom-3 right-3 p-3 rounded-full bg-red-500 text-xl cursor-pointer outline-none hover:shadow-md  duration-500 transition-all ease-in-out"
+                        onClick={() => {
+                          deleteImageObject(songImageUrl, "image");
+                        }}
+                      >
+                        <MdDelete className="text-white" />
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
-            <div className="bg-card backdrop-blur-md w-full lg:w-300 h-300 rounded-md border-2 border-dotted border-gray-300 cursor-pointer">
+            <div className="bg-card  backdrop-blur-md w-full lg:w-300 h-300 rounded-md border-2 border-dotted border-gray-300 cursor-pointer">
               {isAudioLoading && <ImageLoader progress={uploadProgress} />}
-              {!audioAsset ? (
-                <ImageUploader
-                  setImageURL={setAudioAsset}
-                  setAlert={setSetAlert}
-                  alertMsg={setAlertMsg}
-                  isLoading={setIsAudioLoading}
-                  setProgress={setUploadProgress}
-                  isImage={false}
-                />
-              ) : (
-                <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-md">
-                  <audio src={audioAsset} controls />
-                  <button
-                    type="button"
-                    className="absolute bottom-3 right-3 p-3 rounded-full bg-red-500 text-xl cursor-pointer outline-none hover:shadow-md  duration-500 transition-all ease-in-out"
-                    onClick={() => {
-                      deleteImageObject(audioAsset, "audio");
-                    }}
-                  >
-                    <MdDelete className="text-white" />
-                  </button>
-                </div>
+              {!isAudioLoading && (
+                <>
+                  {!audioAsset ? (
+                    <ImageUploader
+                      setImageURL={setAudioAsset}
+                      setAlert={setSetAlert}
+                      alertMsg={setAlertMsg}
+                      isLoading={setIsAudioLoading}
+                      setProgress={setUploadProgress}
+                      isImage={false}
+                    />
+                  ) : (
+                    <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-md">
+                      <div className="absolute top-2 right-2 flex items-center gap-3">
+                        <IoMusicalNote className="text-2xl text-textColor" />
+                        <p className="text-textColor text-base font-semibold">
+                          {duration}
+                        </p>
+                      </div>
+                      <audio ref={audioRef} src={audioAsset} controls />
+                      <button
+                        type="button"
+                        className="absolute bottom-3 right-3 p-3 rounded-full bg-red-500 text-xl cursor-pointer outline-none hover:shadow-md  duration-500 transition-all ease-in-out"
+                        onClick={() => {
+                          deleteImageObject(audioAsset, "audio");
+                        }}
+                      >
+                        <MdDelete className="text-white" />
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
-            <div className="flex items-center justify-end w-full">
+            <div className="flex items-center justify-end w-full p-4">
               {isImageLoading || isAudioLoading ? (
                 <DisabledButton />
               ) : (
-                <button
-                  disabled={!audioAsset || !songImageUrl ? true : false}
-                  type=""
+                <motion.button
+                  whileTap={{ scale: 0.75 }}
+                  className="px-8 py-2 rounded-md text-white bg-red-600 hover:shadow-lg"
+                  onClick={saveSong}
                 >
                   Send
-                </button>
+                </motion.button>
               )}
             </div>
           </div>
         </div>
-        <div>2</div>
+        <div className="flex flex-col items-center justify-center w-full p-4">
+          <AddNewArtist />
+          <AddNewAlbum />
+        </div>
       </div>
       {setAlert && (
         <>
-          {setAlert ? (
+          {setAlert === "success" ? (
+            <AlertSuccess msg={alertMsg} />
+          ) : (
+            <AlertError msg={alertMsg} />
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+export const AddNewArtist = () => {
+  const [isArtist, setIsArtist] = useState(false);
+  const [artistProgress, setArtistProgress] = useState(0);
+
+  const [alert, setAlert] = useState(false);
+  const [alertMsg, setAlertMsg] = useState(null);
+  const [artistCoverImage, setArtistCoverImage] = useState(null);
+
+  const [artistName, setArtistName] = useState("");
+  const [twitter, setTwitter] = useState("");
+  const [instagram, setInstagram] = useState("");
+
+  const [{ artists }, dispatch] = useStateValue();
+
+  const deleteImageObject = (songURL) => {
+    setIsArtist(true);
+    setArtistCoverImage(null);
+    const deleteRef = ref(storage, songURL);
+    deleteObject(deleteRef).then(() => {
+      setAlert("success");
+      setAlertMsg("File removed successfully");
+      setTimeout(() => {
+        setAlert(null);
+      }, 4000);
+      setIsArtist(false);
+    });
+  };
+
+  const saveArtist = () => {
+    if (!artistCoverImage || !artistName) {
+      setAlert("error");
+      setAlertMsg("Required fields are missing");
+      setTimeout(() => {
+        setAlert(null);
+      }, 4000);
+    } else {
+      setIsArtist(true);
+      const data = {
+        name: artistName,
+        imageURL: artistCoverImage,
+        twitter: twitter,
+        instagram: instagram,
+      };
+      saveNewArtist(data).then((res) => {
+        getAllArtist().then((artistData) => {
+          dispatch({ type: actionType.SET_ARTISTS, artists: artistData.data });
+        });
+      });
+      setIsArtist(false);
+      setArtistCoverImage(null);
+      setArtistName("");
+      setTwitter("");
+      setInstagram("");
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-evenly w-full flex-wrap">
+      <div className="bg-card  backdrop-blur-md w-full lg:w-225 h-225 rounded-md border-2 border-dotted border-gray-300 cursor-pointer">
+        {isArtist && <ImageLoader progress={artistProgress} />}
+        {!isArtist && (
+          <>
+            {!artistCoverImage ? (
+              <ImageUploader
+                setImageURL={setArtistCoverImage}
+                setAlert={setAlert}
+                alertMsg={setAlertMsg}
+                isLoading={setIsArtist}
+                setProgress={setArtistProgress}
+                isImage={true}
+              />
+            ) : (
+              <div className="relative w-full h-full overflow-hidden rounded-md">
+                <img
+                  src={artistCoverImage}
+                  alt="uploaded image"
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  className="absolute bottom-3 right-3 p-3 rounded-full bg-red-500 text-xl cursor-pointer outline-none hover:shadow-md  duration-500 transition-all ease-in-out"
+                  onClick={() => {
+                    deleteImageObject(artistCoverImage);
+                  }}
+                >
+                  <MdDelete className="text-white" />
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <div className="flex flex-col items-center justify-center gap-4 ">
+        <input
+          type="text"
+          placeholder="Artist Name"
+          className="w-full lg:w-300 p-3 rounded-md text-base font-semibold text-textColor outline-none shadow-sm border border-gray-300 bg-transparent"
+          value={artistName}
+          onChange={(e) => setArtistName(e.target.value)}
+        />
+
+        <div className="w-full lg:w-300 p-3 flex items-center rounded-md  shadow-sm border border-gray-300">
+          <p className="text-base font-semibold text-gray-400">
+            www.twitter.com/
+          </p>
+          <input
+            type="text"
+            placeholder="your id"
+            className="w-full text-base font-semibold text-textColor outline-none bg-transparent"
+            value={twitter}
+            onChange={(e) => setTwitter(e.target.value)}
+          />
+        </div>
+
+        <div className="w-full lg:w-300 p-3 flex items-center rounded-md  shadow-sm border border-gray-300">
+          <p className="text-base font-semibold text-gray-400">
+            www.instagram.com/
+          </p>
+          <input
+            type="text"
+            placeholder="your id"
+            className="w-full text-base font-semibold text-textColor outline-none bg-transparent"
+            value={instagram}
+            onChange={(e) => setInstagram(e.target.value)}
+          />
+        </div>
+
+        <div className="w-full lg:w-300 flex items-center justify-center lg:justify-end">
+          {isArtist ? (
+            <DisabledButton />
+          ) : (
+            <motion.button
+              whileTap={{ scale: 0.75 }}
+              className="px-8 py-2 rounded-md text-white bg-red-600 hover:shadow-lg"
+              onClick={saveArtist}
+            >
+              Send
+            </motion.button>
+          )}
+        </div>
+      </div>
+
+      {alert && (
+        <>
+          {alert === "success" ? (
+            <AlertSuccess msg={alertMsg} />
+          ) : (
+            <AlertError msg={alertMsg} />
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+export const AddNewAlbum = () => {
+  const [isArtist, setIsArtist] = useState(false);
+  const [artistProgress, setArtistProgress] = useState(0);
+
+  const [alert, setAlert] = useState(false);
+  const [alertMsg, setAlertMsg] = useState(null);
+  const [artistCoverImage, setArtistCoverImage] = useState(null);
+
+  const [artistName, setArtistName] = useState("");
+
+  const [{ artists }, dispatch] = useStateValue();
+
+  const deleteImageObject = (songURL) => {
+    setIsArtist(true);
+    setArtistCoverImage(null);
+    const deleteRef = ref(storage, songURL);
+    deleteObject(deleteRef).then(() => {
+      setAlert("success");
+      setAlertMsg("File removed successfully");
+      setTimeout(() => {
+        setAlert(null);
+      }, 4000);
+      setIsArtist(false);
+    });
+  };
+
+  const saveArtist = () => {
+    if (!artistCoverImage || !artistName) {
+      setAlert("error");
+      setAlertMsg("Required fields are missing");
+      setTimeout(() => {
+        setAlert(null);
+      }, 4000);
+    } else {
+      setIsArtist(true);
+      const data = {
+        name: artistName,
+        imageURL: artistCoverImage,
+      };
+      saveNewAlbum(data).then((res) => {
+        getAllAlbums().then((albumData) => {
+          dispatch({
+            type: actionType.SET_ALL_ALBUMNS,
+            albumData: albumData.data,
+          });
+        });
+      });
+      setIsArtist(false);
+      setArtistCoverImage(null);
+      setArtistName("");
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-evenly w-full flex-wrap">
+      <div className="bg-card  backdrop-blur-md w-full lg:w-225 h-225 rounded-md border-2 border-dotted border-gray-300 cursor-pointer">
+        {isArtist && <ImageLoader progress={artistProgress} />}
+        {!isArtist && (
+          <>
+            {!artistCoverImage ? (
+              <ImageUploader
+                setImageURL={setArtistCoverImage}
+                setAlert={setAlert}
+                alertMsg={setAlertMsg}
+                isLoading={setIsArtist}
+                setProgress={setArtistProgress}
+                isImage={true}
+              />
+            ) : (
+              <div className="relative w-full h-full overflow-hidden rounded-md">
+                <img
+                  src={artistCoverImage}
+                  alt="uploaded image"
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  className="absolute bottom-3 right-3 p-3 rounded-full bg-red-500 text-xl cursor-pointer outline-none hover:shadow-md  duration-500 transition-all ease-in-out"
+                  onClick={() => {
+                    deleteImageObject(artistCoverImage);
+                  }}
+                >
+                  <MdDelete className="text-white" />
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <div className="flex flex-col items-center justify-center gap-4 ">
+        <input
+          type="text"
+          placeholder="Artist Name"
+          className="w-full lg:w-300 p-3 rounded-md text-base font-semibold text-textColor outline-none shadow-sm border border-gray-300 bg-transparent"
+          value={artistName}
+          onChange={(e) => setArtistName(e.target.value)}
+        />
+
+        <div className="w-full lg:w-300 flex items-center justify-center lg:justify-end">
+          {isArtist ? (
+            <DisabledButton />
+          ) : (
+            <motion.button
+              whileTap={{ scale: 0.75 }}
+              className="px-8 py-2 rounded-md text-white bg-red-600 hover:shadow-lg"
+              onClick={saveArtist}
+            >
+              Send
+            </motion.button>
+          )}
+        </div>
+      </div>
+
+      {alert && (
+        <>
+          {alert === "success" ? (
             <AlertSuccess msg={alertMsg} />
           ) : (
             <AlertError msg={alertMsg} />
