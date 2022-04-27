@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { AiOutlineClear } from "react-icons/ai";
-import { getAllSongs } from "../api";
+import { deleteSongById, getAllSongs } from "../api";
 import { useStateValue } from "../Context/StateProvider";
 import { actionType } from "../Context/reducer";
-import { IoAdd, IoPlay } from "react-icons/io5";
+import { IoAdd, IoPlay, IoTrash } from "react-icons/io5";
 import { NavLink } from "react-router-dom";
+import AlertSuccess from "./AlertSuccess";
+import AlertError from "./AlertError";
 
 const DashboardSongs = () => {
   const [songFilter, setSongFilter] = useState("");
@@ -24,6 +26,20 @@ const DashboardSongs = () => {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (songFilter.length > 0) {
+      const filtered = allSongs.filter(
+        (data) =>
+          data.artist.toLowerCase().includes(songFilter) ||
+          data.language.toLowerCase().includes(songFilter) ||
+          data.name.toLowerCase().includes(songFilter)
+      );
+      setFilteredSongs(filtered);
+    } else {
+      setFilteredSongs(null);
+    }
+  }, [songFilter]);
 
   return (
     <div className="w-full p-4 flex items-center justify-center flex-col">
@@ -61,7 +77,7 @@ const DashboardSongs = () => {
         )}
       </div>
 
-      <div className="relative w-full my-4  flex flex-wrap gap-3  items-center justify-evenly p-4 py-12 border border-gray-300 rounded-md">
+      <div className="relative w-full  my-4 p-4 py-12 border border-gray-300 rounded-md">
         <div className="absolute top-4 left-4">
           <p className="text-xl font-bold">
             <span className="text-sm font-semibold text-textColor">
@@ -71,21 +87,93 @@ const DashboardSongs = () => {
           </p>
         </div>
 
-        {allSongs &&
-          allSongs.map((data) => <SongCard key={data._id} data={data} />)}
+        <SongContainer data={filteredSongs ? filteredSongs : allSongs} />
       </div>
     </div>
   );
 };
 
-export const SongCard = ({ data }) => {
-  const [isHover, setIsHover] = useState(false);
+export const SongContainer = ({ data }) => {
   return (
-    <div
-      className="w-40 min-w-210 px-2 py-4 cursor-pointer hover:shadow-xl hover:bg-card bg-gray-100 shadow-md rounded-lg flex flex-col items-center relative"
+    <div className=" w-full  flex flex-wrap gap-3  items-center justify-evenly">
+      {data &&
+        data.map((song, i) => (
+          <SongCard key={song._id} data={song} index={i} />
+        ))}
+    </div>
+  );
+};
+
+export const SongCard = ({ data, index }) => {
+  const [isHover, setIsHover] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
+  const [alert, setAlert] = useState(false);
+  const [alertMsg, setAlertMsg] = useState(null);
+
+  const [{ allSongs }, dispatch] = useStateValue();
+
+  const deleteObject = (id) => {
+    console.log(id);
+    deleteSongById(id).then((res) => {
+      console.log(res);
+      // if (res.success) {
+      //   setAlert("success");
+      //   setAlertMsg(res.msg);
+      //   getAllSongs().then((data) => {
+      //     dispatch({
+      //       type: actionType.SET_ALL_SONGS,
+      //       allSongs: data.data,
+      //     });
+      //   });
+      //   setTimeout(() => {
+      //     setAlert(false);
+      //   }, 4000);
+      // } else {
+      //   setAlert("error");
+      //   setAlertMsg(res.msg);
+      //   setTimeout(() => {
+      //     setAlert(false);
+      //   }, 4000);
+      // }
+    });
+  };
+  return (
+    <motion.div
+      initial={{ opacity: 0, translateX: -50 }}
+      animate={{ opacity: 1, translateX: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.1 }}
+      className="relative w-40 min-w-210 px-2 py-4 cursor-pointer hover:shadow-xl hover:bg-card bg-gray-100 shadow-md rounded-lg flex flex-col items-center"
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
+      {isDeleted && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.6 }}
+          className="absolute z-10 p-2 inset-0 bg-card backdrop-blur-md flex flex-col gap-6 items-center justify-center"
+        >
+          <p className="text-sm text-center text-textColor font-semibold">
+            Are you sure do you want to delete this song?
+          </p>
+
+          <div className="flex items-center gap-3">
+            <button
+              className="text-sm px-4 py-1 rounded-md text-white hover:shadow-md bg-teal-400"
+              onClick={() => deleteObject(data._id)}
+            >
+              Yes
+            </button>
+            <button
+              className="text-sm px-4 py-1 rounded-md text-white hover:shadow-md bg-gray-400"
+              onClick={() => setIsDeleted(false)}
+            >
+              No
+            </button>
+          </div>
+        </motion.div>
+      )}
+
       <div className="w-40 min-w-[160px] rounded-lg drop-shadow-lg relative overflow-hidden">
         <motion.img
           whileHover={{ scale: 1.05 }}
@@ -111,10 +199,23 @@ export const SongCard = ({ data }) => {
         <span className="block text-sm text-gray-400 my-1">{data.artist}</span>
       </p>
 
-      <p className="text-xs font-semibold text-textColor absolute bottom-2 right-2">
-        {data.duration}
-      </p>
-    </div>
+      <div className="w-full absolute bottom-2 right-2 flex items-center justify-between px-4">
+        <motion.i whileTap={{ scale: 0.75 }} onClick={() => setIsDeleted(true)}>
+          <IoTrash className="text-base text-red-400 drop-shadow-md hover:text-red-600" />
+        </motion.i>
+        <p className="text-xs font-semibold text-textColor ">{data.duration}</p>
+      </div>
+
+      {alert && (
+        <>
+          {alert === "success" ? (
+            <AlertSuccess msg={alertMsg} />
+          ) : (
+            <AlertError msg={alertMsg} />
+          )}
+        </>
+      )}
+    </motion.div>
   );
 };
 

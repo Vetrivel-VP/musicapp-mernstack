@@ -90,11 +90,11 @@ const DashboardUser = () => {
           <p className="text-sm text-textColor font-semibold w-275 min-w-[160px] text-center">Role</p>{" "}
         </div>
         {allUsers && !filtereUsers
-          ? allUsers?.map((data) => (
-              <DashboardUserCard data={data} key={data._id} />
+          ? allUsers?.map((data, i) => (
+              <DashboardUserCard data={data} key={data._id} index={i} />
             ))
-          : filtereUsers?.map((data) => (
-              <DashboardUserCard data={data} key={data._id} />
+          : filtereUsers?.map((data, i) => (
+              <DashboardUserCard data={data} key={data._id} index={i} />
             ))}
       </div>
     </div>

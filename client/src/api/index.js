@@ -97,3 +97,12 @@ export const saveNewSong = async (data) => {
     return null;
   }
 };
+
+export const deleteSongById = async (id) => {
+  try {
+    const res = axios.delete(`${baseURL}api/songs/delete/${id}`);
+    return res;
+  } catch (error) {
+    return null;
+  }
+};

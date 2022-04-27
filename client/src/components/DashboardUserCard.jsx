@@ -6,7 +6,7 @@ import { actionType } from "../Context/reducer";
 import { useStateValue } from "../Context/StateProvider";
 import { MdDelete } from "react-icons/md";
 
-const DashboardUserCard = ({ data }) => {
+const DashboardUserCard = ({ data, index }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdateRole, setIsUpdateRole] = useState(false);
 
@@ -49,7 +49,12 @@ const DashboardUserCard = ({ data }) => {
   };
 
   return (
-    <div className="relative w-full rounded-md flex items-center justify-between py-4 bg-lightOverlay cursor-pointer hover:bg-card hover:shadow-md">
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.1 }}
+      className="relative w-full rounded-md flex items-center justify-between py-4 bg-lightOverlay cursor-pointer hover:bg-card hover:shadow-md"
+    >
       {data._id !== user?.user._id && (
         <motion.div
           whileTap={{ scale: 0.75 }}
@@ -122,7 +127,7 @@ const DashboardUserCard = ({ data }) => {
       {isLoading && (
         <div className="absolute inset-0 bg-card animate-pulse"></div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

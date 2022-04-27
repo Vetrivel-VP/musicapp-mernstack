@@ -15,3 +15,6 @@ export { default as DashboardSongs } from "./DashboardSongs";
 export { default as DashboardUser } from "./DashboardUser";
 export { default as DashboardUserCard } from "./DashboardUserCard";
 export { default as DashboardNewSong } from "./DashboardNewSong";
+
+export { default as AlertSuccess } from "./AlertSuccess";
+export { default as AlertError } from "./AlertError";

@@ -10,7 +10,6 @@ import { motion } from "framer-motion";
 
 import { BiCloudUpload } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
-import { BsEmojiSmile, BsEmojiFrown } from "react-icons/bs";
 
 import { storage } from "../config/firebase.config";
 import { useStateValue } from "../Context/StateProvider";
@@ -26,6 +25,8 @@ import {
 import { actionType } from "../Context/reducer";
 import { filterByLanguage, filters } from "../utils/supportfunctions";
 import { IoMusicalNote } from "react-icons/io5";
+import AlertSuccess from "./AlertSuccess";
+import AlertError from "./AlertError";
 
 export const ImageLoader = ({ progress }) => {
   return (
@@ -37,44 +38,6 @@ export const ImageLoader = ({ progress }) => {
         <div className="absolute inset-0 rounded-full bg-red-600 blur-xl "></div>
       </div>
     </div>
-  );
-};
-
-export const AlertSuccess = ({ msg }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -100, scale: 0.6 }}
-      animate={{ opacity: 1, y: 50, scale: 1 }}
-      exit={{ opacity: 0, y: -100, scale: 0.6 }}
-      className="w-screen z-50 fixed top-0 left-0 flex items-center justify-center"
-    >
-      <div className="w-460  bg-card rounded-md shadow-md backdrop-blur-md px-4 py-2 flex items-center gap-4">
-        <div className="w-[4px] h-10 bg-green-500 rounded-md"></div>
-        <BsEmojiSmile className="text-xl text-green-500" />
-        <p className="text-base font-semibold text-textColor">
-          {msg?.length > 50 ? `${msg?.slice(0, 50)}...` : msg}
-        </p>
-      </div>
-    </motion.div>
-  );
-};
-
-export const AlertError = ({ msg }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -100, scale: 0.6 }}
-      animate={{ opacity: 1, y: 50, scale: 1 }}
-      exit={{ opacity: 0, y: -100, scale: 0.6 }}
-      className="w-screen z-50 fixed top-0 left-0 flex items-center justify-center"
-    >
-      <div className="w-460  bg-card rounded-md shadow-md backdrop-blur-md px-4 py-2 flex items-center gap-4">
-        <div className="w-[4px] h-10 bg-red-500 rounded-md"></div>
-        <BsEmojiFrown className="text-xl text-red-500" />
-        <p className="text-base font-semibold text-textColor">
-          {msg?.length > 50 ? `${msg?.slice(0, 50)}...` : msg}
-        </p>
-      </div>
-    </motion.div>
   );
 };
 
@@ -215,13 +178,6 @@ const DashboardNewSong = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (audioAsset) {
-      console.log(duration);
-      setDuration(calculateTime(audioRef.current.duration));
-    }
-  }, [duration]);
-
   const calculateTime = (sec) => {
     const minutes = Math.floor(sec / 60);
     const returnMin = minutes < 10 ? `0${minutes}` : `${minutes}`;
@@ -267,7 +223,6 @@ const DashboardNewSong = () => {
         artist: artistFilter,
         language: languageFilter,
         category: filterTerm,
-        duration: duration,
       };
       saveNewSong(data).then((res) => {
         getAllSongs().then((songs) => {
@@ -362,12 +317,6 @@ const DashboardNewSong = () => {
                     />
                   ) : (
                     <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-md">
-                      <div className="absolute top-2 right-2 flex items-center gap-3">
-                        <IoMusicalNote className="text-2xl text-textColor" />
-                        <p className="text-textColor text-base font-semibold">
-                          {duration}
-                        </p>
-                      </div>
                       <audio ref={audioRef} src={audioAsset} controls />
                       <button
                         type="button"
