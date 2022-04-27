@@ -24,7 +24,7 @@ const songRoute = require("./routes/songs");
 app.use("/api/songs/", songRoute);
 
 // If any depreciation warning add depreciation options
-mongoose.connect(process.env.DB_STRING, () => {
+mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true }, () => {
   console.log("Mongodb Connected");
 });
 

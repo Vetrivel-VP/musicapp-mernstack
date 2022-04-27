@@ -4,7 +4,7 @@ import { AiOutlineClear } from "react-icons/ai";
 import { getAllSongs } from "../api";
 import { useStateValue } from "../Context/StateProvider";
 import { actionType } from "../Context/reducer";
-import { IoAdd } from "react-icons/io5";
+import { IoAdd, IoPlay } from "react-icons/io5";
 import { NavLink } from "react-router-dom";
 
 const DashboardSongs = () => {
@@ -71,23 +71,50 @@ const DashboardSongs = () => {
           </p>
         </div>
 
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
+        {allSongs &&
+          allSongs.map((data) => <SongCard key={data._id} data={data} />)}
       </div>
     </div>
   );
 };
 
-export const SongCard = () => {
+export const SongCard = ({ data }) => {
+  const [isHover, setIsHover] = useState(false);
   return (
-    <div className="w-40 min-w-210 p-4 bg-card shadow-md rounded-md">hai</div>
+    <div
+      className="w-40 min-w-210 px-2 py-4 cursor-pointer hover:shadow-xl hover:bg-card bg-gray-100 shadow-md rounded-lg flex flex-col items-center relative"
+      onMouseEnter={() => setIsHover(true)}
+      onMouseLeave={() => setIsHover(false)}
+    >
+      <div className="w-40 min-w-[160px] rounded-lg drop-shadow-lg relative overflow-hidden">
+        <motion.img
+          whileHover={{ scale: 1.05 }}
+          src={data.imageURL}
+          alt=""
+          className=" w-full h-full rounded-lg object-cover"
+        />
+        {isHover && (
+          <motion.div
+            whileTap={{ scale: 0.75 }}
+            initial={{ opacity: 0, scale: 0.6 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.6 }}
+            className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-red-400 hover:bg-red-600 flex items-center justify-center"
+          >
+            <IoPlay className=" text-base text-white" />
+          </motion.div>
+        )}
+      </div>
+
+      <p className="text-base text-headingColor font-semibold my-2">
+        {data.name.length > 25 ? `${data.name.slice(0, 25)}` : data.name}
+        <span className="block text-sm text-gray-400 my-1">{data.artist}</span>
+      </p>
+
+      <p className="text-xs font-semibold text-textColor absolute bottom-2 right-2">
+        {data.duration}
+      </p>
+    </div>
   );
 };
 
