@@ -115,26 +115,26 @@ export const SongCard = ({ data, index }) => {
   const deleteObject = (id) => {
     console.log(id);
     deleteSongById(id).then((res) => {
-      console.log(res);
-      // if (res.success) {
-      //   setAlert("success");
-      //   setAlertMsg(res.msg);
-      //   getAllSongs().then((data) => {
-      //     dispatch({
-      //       type: actionType.SET_ALL_SONGS,
-      //       allSongs: data.data,
-      //     });
-      //   });
-      //   setTimeout(() => {
-      //     setAlert(false);
-      //   }, 4000);
-      // } else {
-      //   setAlert("error");
-      //   setAlertMsg(res.msg);
-      //   setTimeout(() => {
-      //     setAlert(false);
-      //   }, 4000);
-      // }
+      // console.log(res.data);
+      if (res.data.success) {
+        setAlert("success");
+        setAlertMsg(res.data.msg);
+        getAllSongs().then((data) => {
+          dispatch({
+            type: actionType.SET_ALL_SONGS,
+            allSongs: data.data,
+          });
+        });
+        setTimeout(() => {
+          setAlert(false);
+        }, 4000);
+      } else {
+        setAlert("error");
+        setAlertMsg(res.data.msg);
+        setTimeout(() => {
+          setAlert(false);
+        }, 4000);
+      }
     });
   };
   return (
@@ -174,7 +174,7 @@ export const SongCard = ({ data, index }) => {
         </motion.div>
       )}
 
-      <div className="w-40 min-w-[160px] rounded-lg drop-shadow-lg relative overflow-hidden">
+      <div className="w-40 min-w-[160px] h-40 min-h-[160px] rounded-lg drop-shadow-lg relative overflow-hidden">
         <motion.img
           whileHover={{ scale: 1.05 }}
           src={data.imageURL}
