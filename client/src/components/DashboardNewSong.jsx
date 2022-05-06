@@ -219,11 +219,13 @@ const DashboardNewSong = () => {
       const data = {
         name: songName,
         imageURL: songImageUrl,
+        songUrl: audioAsset,
         album: albumFilter,
         artist: artistFilter,
         language: languageFilter,
         category: filterTerm,
       };
+
       saveNewSong(data).then((res) => {
         getAllSongs().then((songs) => {
           dispatch({ type: actionType.SET_ALL_SONGS, allSongs: songs.data });

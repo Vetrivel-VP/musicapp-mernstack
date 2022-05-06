@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AiOutlineClear } from "react-icons/ai";
 import { deleteSongById, getAllSongs } from "../api";
 import { useStateValue } from "../Context/StateProvider";
 import { actionType } from "../Context/reducer";
-import { IoAdd, IoPlay, IoTrash } from "react-icons/io5";
+import { IoAdd, IoPause, IoPlay, IoTrash } from "react-icons/io5";
 import { NavLink } from "react-router-dom";
 import AlertSuccess from "./AlertSuccess";
 import AlertError from "./AlertError";
@@ -106,11 +106,25 @@ export const SongContainer = ({ data }) => {
 
 export const SongCard = ({ data, index }) => {
   const [isHover, setIsHover] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [alert, setAlert] = useState(false);
   const [alertMsg, setAlertMsg] = useState(null);
 
+  const audioRef = useRef();
+
   const [{ allSongs }, dispatch] = useStateValue();
+
+  const changePlayPause = () => {
+    const prevValue = isPlaying;
+    setIsPlaying(!prevValue);
+
+    if (!prevValue) {
+      audioRef.current.play();
+    } else {
+      audioRef.current.pause();
+    }
+  };
 
   const deleteObject = (id) => {
     console.log(id);
@@ -146,6 +160,7 @@ export const SongCard = ({ data, index }) => {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
+      <audio src={data.songUrl} ref={audioRef} />
       {isDeleted && (
         <motion.div
           initial={{ opacity: 0, scale: 0.6 }}
@@ -189,7 +204,17 @@ export const SongCard = ({ data, index }) => {
             exit={{ opacity: 0, scale: 0.6 }}
             className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-red-400 hover:bg-red-600 flex items-center justify-center"
           >
-            <IoPlay className=" text-base text-white" />
+            {isPlaying ? (
+              <IoPause
+                className=" text-base text-white"
+                onClick={changePlayPause}
+              />
+            ) : (
+              <IoPlay
+                className=" text-base text-white"
+                onClick={changePlayPause}
+              />
+            )}
           </motion.div>
         )}
       </div>
@@ -203,7 +228,6 @@ export const SongCard = ({ data, index }) => {
         <motion.i whileTap={{ scale: 0.75 }} onClick={() => setIsDeleted(true)}>
           <IoTrash className="text-base text-red-400 drop-shadow-md hover:text-red-600" />
         </motion.i>
-        <p className="text-xs font-semibold text-textColor ">{data.duration}</p>
       </div>
 
       {alert && (

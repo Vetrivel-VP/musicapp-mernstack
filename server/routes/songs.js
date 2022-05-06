@@ -34,6 +34,7 @@ router.post("/save", async (req, res) => {
   const newSong = song({
     name: req.body.name,
     imageURL: req.body.imageURL,
+    songUrl: req.body.songUrl,
     album: req.body.album,
     artist: req.body.artist,
     language: req.body.language,
@@ -59,6 +60,7 @@ router.put("/update/:updateId", async (req, res) => {
       {
         name: req.body.name,
         imageURL: req.body.imageURL,
+        songUrl: req.body.songUrl,
         album: req.body.album,
         artist: req.body.artist,
         language: req.body.language,

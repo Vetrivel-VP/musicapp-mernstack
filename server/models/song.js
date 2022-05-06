@@ -11,6 +11,10 @@ const SongSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    songUrl: {
+      type: String,
+      required: true,
+    },
     album: {
       type: String,
     },
