@@ -54,7 +54,7 @@ function App() {
 
   return (
     <AnimatePresence>
-      <div className="h-auto flex items-center justify-center min-w-620">
+      <div className="h-auto flex items-center justify-center min-w-[680px]">
         {isLoading ||
           (!user && (
             <div className="fixed inset-0 bg-loaderOverlay backdrop-blur-sm ">
