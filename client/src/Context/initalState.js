@@ -11,4 +11,5 @@ export const initialState = {
   albumFilter: null,
   song: null,
   isSongPlaying: false,
+  miniPlayer: false,
 };
