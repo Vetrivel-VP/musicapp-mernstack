@@ -9,4 +9,6 @@ export const initialState = {
   allSongs: null,
   allAlbums: null,
   albumFilter: null,
+  song: null,
+  isSongPlaying: false,
 };

@@ -9,6 +9,8 @@ export const actionType = {
   SET_ALL_SONGS: "SET_ALL_SONGS",
   SET_ALL_ALBUMNS: "SET_ALL_ALBUMNS",
   SET_ALBUM_FILTER: "SET_ALBUM_FILTER",
+  SET_SONG: "SET_SONG",
+  SET_SONG_PLAYING: "SET_SONG_PLAYING",
 };
 
 const reducer = (state, action) => {
@@ -73,6 +75,18 @@ const reducer = (state, action) => {
       return {
         ...state,
         albumFilter: action.albumFilter,
+      };
+
+    case actionType.SET_SONG:
+      return {
+        ...state,
+        song: action.song,
+      };
+
+    case actionType.SET_SONG_PLAYING:
+      return {
+        ...state,
+        isSongPlaying: action.isSongPlaying,
       };
 
     default:

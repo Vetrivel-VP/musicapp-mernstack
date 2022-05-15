@@ -105,24 +105,24 @@ export const SongContainer = ({ data }) => {
 };
 
 export const SongCard = ({ data, index }) => {
-  const [isHover, setIsHover] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [alert, setAlert] = useState(false);
   const [alertMsg, setAlertMsg] = useState(null);
 
-  const audioRef = useRef();
+  const [{ allSongs, song, isSongPlaying }, dispatch] = useStateValue();
 
-  const [{ allSongs }, dispatch] = useStateValue();
-
-  const changePlayPause = () => {
-    const prevValue = isPlaying;
-    setIsPlaying(!prevValue);
-
-    if (!prevValue) {
-      audioRef.current.play();
-    } else {
-      audioRef.current.pause();
+  const addSongToContext = () => {
+    if (!isSongPlaying) {
+      dispatch({
+        type: actionType.SET_SONG_PLAYING,
+        isSongPlaying: true,
+      });
+    }
+    if (song?._id !== data._id) {
+      dispatch({
+        type: actionType.SET_SONG,
+        song: data,
+      });
     }
   };
 
@@ -153,14 +153,13 @@ export const SongCard = ({ data, index }) => {
   };
   return (
     <motion.div
+      whileTap={{ scale: 0.8 }}
       initial={{ opacity: 0, translateX: -50 }}
       animate={{ opacity: 1, translateX: 0 }}
       transition={{ duration: 0.3, delay: index * 0.1 }}
       className="relative w-40 min-w-210 px-2 py-4 cursor-pointer hover:shadow-xl hover:bg-card bg-gray-100 shadow-md rounded-lg flex flex-col items-center"
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
+      onClick={addSongToContext}
     >
-      <audio src={data.songUrl} ref={audioRef} />
       {isDeleted && (
         <motion.div
           initial={{ opacity: 0, scale: 0.6 }}
@@ -196,27 +195,6 @@ export const SongCard = ({ data, index }) => {
           alt=""
           className=" w-full h-full rounded-lg object-cover"
         />
-        {isHover && (
-          <motion.div
-            whileTap={{ scale: 0.75 }}
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.6 }}
-            className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-red-400 hover:bg-red-600 flex items-center justify-center"
-          >
-            {isPlaying ? (
-              <IoPause
-                className=" text-base text-white"
-                onClick={changePlayPause}
-              />
-            ) : (
-              <IoPlay
-                className=" text-base text-white"
-                onClick={changePlayPause}
-              />
-            )}
-          </motion.div>
-        )}
       </div>
 
       <p className="text-base text-headingColor font-semibold my-2">

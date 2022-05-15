@@ -18,3 +18,5 @@ export { default as DashboardNewSong } from "./DashboardNewSong";
 
 export { default as AlertSuccess } from "./AlertSuccess";
 export { default as AlertError } from "./AlertError";
+
+export { default as MusicPlayer } from "./MusicPlayer";

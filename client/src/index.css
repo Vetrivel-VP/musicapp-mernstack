@@ -14,6 +14,45 @@ code {
     monospace;
 }
 
+.rhap_container{
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.rhap_play-pause-button{
+  color: #ff0000 !important;
+  transition: all 0.3s ease-in-out;
+}
+
+.rhap_play-pause-button:hover{
+  transform: scale(1.2);
+}
+
+.rhap_forward-button, .rhap_rewind-button, .rhap_skip-button, .rhap_volume-button, .rhap_repeat-button{
+  transition: all 0.3s ease-in-out;
+}
+
+.rhap_forward-button:hover, .rhap_rewind-button:hover, .rhap_skip-button:hover, .rhap_volume-button:hover, .rhap_repeat-button:hover{
+  transform: scale(1.2);
+  color : #555 !important;
+}
+
+.rhap_progress-filled{
+  background-color: #ff0000 !important;
+}
+
+.rhap_progress-indicator, .rhap_volume-indicator{
+  background: #b4b4b4  !important;
+}
+
+.rhap_progress-indicator:hover, .rhap_volume-indicator:hover{
+  transform: scale(1.2);
+}
+
+.rhap_download-progress, .rhap_volume-bar{
+  background-color: #ff000033 !important; 
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
