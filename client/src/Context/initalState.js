@@ -9,7 +9,7 @@ export const initialState = {
   allSongs: null,
   allAlbums: null,
   albumFilter: null,
-  song: null,
+  song: 0,
   isSongPlaying: false,
   miniPlayer: false,
 };

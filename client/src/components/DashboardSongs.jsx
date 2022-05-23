@@ -118,10 +118,10 @@ export const SongCard = ({ data, index }) => {
         isSongPlaying: true,
       });
     }
-    if (song?._id !== data._id) {
+    if (song !== index) {
       dispatch({
         type: actionType.SET_SONG,
-        song: data,
+        song: index,
       });
     }
   };

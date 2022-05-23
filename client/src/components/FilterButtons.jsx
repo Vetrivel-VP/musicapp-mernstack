@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoChevronDown } from "react-icons/io5";
 
 import { motion } from "framer-motion";

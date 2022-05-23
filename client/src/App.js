@@ -87,7 +87,7 @@ function App() {
           <Route path="/userProfile" element={<UserProfile />} />
         </Routes>
 
-        {song && isSongPlaying && (
+        {isSongPlaying && (
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
